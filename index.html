@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <meta name="theme-color" content="#000000" />
+  <title>CyberThreats: Amenazas en el Ciberespacio</title>
+  <style>
+    /* ==========================================================================
+       VARIABLES Y TEMA OLED BLACK (#000000 PURO)
+       ========================================================================== */
+    :root {
+      --font-scale: 16px;
+      --bg-oled: #000000;
+      --surface-1: #0a0c10;
+      --surface-2: #14171f;
+      --surface-border: #232936;
+      --text-main: #f0f4f8;
+      --text-muted: #8b98a5;
+      --neon-cyan: #00f3ff;
+      --neon-green: #00ff88;
+      --neon-yellow: #ffe600;
+      --neon-red: #ff3366;
+      --neon-purple: #bf55ec;
+      --card-radius: 14px;
+      --button-radius: 10px;
+      --transition-fast: 0.18s ease;
+      --border-contrast: 1px solid var(--surface-border);
+    }
+
+    /* MODO CONTRASTE EXTREMO */
+    body.extreme-contrast {
+      --bg-oled: #000000 !important;
+      --surface-1: #000000 !important;
+      --surface-2: #050505 !important;
+      --surface-border: #ffffff !important;
+      --text-main: #ffffff !important;
+      --text-muted: #e6e6e6 !important;
+      --neon-cyan: #00ffff !important;
+      --neon-green: #00ff00 !important;
+      --neon-yellow: #ffff00 !important;
+      --neon-red: #ff0000 !important;
+      --neon-purple: #ff00ff !important;
+      --border-contrast: 2px solid #ffffff !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html {
+      font-size: var(--font-scale);
+      background-color: var(--bg-oled);
+    }
+
+    body {
+      background-color: var(--bg-oled);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      line-height: 1.45;
+    }
+
+    /* ==========================================================================
+       BARRA SUPERIOR (HEADER FIJO CON CONTROLES ACCESIBLES)
+       ========================================================================== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: var(--border-contrast);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      font-size: 1.3rem;
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--neon-cyan)); }
+      100% { transform: scale(1.08); filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .brand-sub {
+      font-size: 0.68rem;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-pill {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: var(--button-radius);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-pill:active {
+      transform: scale(0.95);
+      border-color: var(--neon-cyan);
+    }
+
+    .btn-pill.active {
+      background: var(--surface-2);
+      border-color: var(--neon-yellow);
+      color: var(--neon-yellow);
+    }
+
+    #btn-font {
+      min-width: 46px;
+      justify-content: center;
+      color: var(--neon-cyan);
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    /* ==========================================================================
+       NAVEGACIÓN PRINCIPAL (TABS TÁCTILES)
+       ========================================================================== */
+    nav.bottom-nav {
+      position: sticky;
+      bottom: 0;
+      z-index: 99;
+      background: rgba(0, 0, 0, 0.98);
+      border-top: var(--border-contrast);
+      display: flex;
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+      gap: 6px;
+    }
+
+    .nav-item {
+      flex: 1;
+      padding: 8px 4px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--button-radius);
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-item .nav-icon {
+      font-size: 1.15rem;
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active {
+      color: #000;
+      background: var(--neon-cyan);
+      border-color: var(--neon-cyan);
+    }
+
+    body.extreme-contrast .nav-item.active {
+      color: #000000 !important;
+      background: #ffffff !important;
+      border-color: #ffffff !important;
+      font-weight: 900;
+    }
+
+    /* ==========================================================================
+       CONTENEDOR DE CONTENIDO
+       ========================================================================== */
+    main {
+      flex: 1;
+      max-width: 650px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 14px 12px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tab-section {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.22s ease-out;
+    }
+
+    .tab-section.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       TARJETAS Y COMPONENTES VISUALES
+       ========================================================================== */
+    .card {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      border-radius: var(--card-radius);
+      padding: 16px;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-cyan { background: rgba(0, 243, 255, 0.12); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+    .badge-green { background: rgba(0, 255, 136, 0.12); color: var(--neon-green); border: 1px solid var(--neon-green); }
+    .badge-yellow { background: rgba(255, 230, 0, 0.12); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+    .badge-purple { background: rgba(191, 85, 236, 0.12); color: var(--neon-purple); border: 1px solid var(--neon-purple); }
+
+    /* HUD ESTADÍSTICAS */
+    .hud-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .hud-stat {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      border-radius: var(--button-radius);
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .hud-stat-value {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--neon-cyan);
+      font-family: monospace;
+      line-height: 1.1;
+    }
+
+    .hud-stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* BARRA DE PROGRESO */
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    body.extreme-contrast .progress-fill {
+      background: #ffffff !important;
+    }
+
+    /* PREGUNTA / CONCEPTO */
+    .question-box {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .flow-diagram {
+      background: #000;
+      border: 1px dashed var(--neon-cyan);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      font-family: monospace;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background: var(--surface-2);
+      border: var(--border-contrast);
+      color: var(--text-main);
+      padding: 13px 14px;
+      border-radius: var(--button-radius);
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all var(--transition-fast);
+      line-height: 1.35;
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
+    }
+
+    .option-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-family: monospace;
+      font-weight: 800;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+
+    .option-btn.correct {
+      background: rgba(0, 255, 136, 0.15) !important;
+      border-color: var(--neon-green) !important;
+      color: #ffffff !important;
+    }
+    .option-btn.correct .option-indicator {
+      background: var(--neon-green);
+      color: #000000;
+      border-color: var(--neon-green);
+    }
+
+    .option-btn.wrong {
+      background: rgba(255, 51, 102, 0.15) !important;
+      border-color: var(--neon-red) !important;
+      color: #ffffff !important;
+    }
+    .option-btn.wrong .option-indicator {
+      background: var(--neon-red);
+      color: #ffffff;
+      border-color: var(--neon-red);
+    }
+
+    /* FEEDBACK EXPLICATIVO INMEDIATO */
+    .feedback-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: var(--button-radius);
+      font-size: 0.86rem;
+      display: none;
+      animation: fadeIn 0.2s;
+      line-height: 1.4;
+    }
+
+    .feedback-box.show {
+      display: block;
+    }
+
+    .feedback-box.correct {
+      background: #021a0d;
+      border: 1px solid var(--neon-green);
+      color: #b7ffcf;
+    }
+
+    .feedback-box.wrong {
+      background: #1f050b;
+      border: 1px solid var(--neon-red);
+      color: #ffb8c8;
+    }
+
+    body.extreme-contrast .feedback-box {
+      background: #000000 !important;
+      border: 2px solid #ffffff !important;
+      color: #ffffff !important;
+    }
+
+    .btn-action {
+      margin-top: 14px;
+      width: 100%;
+      background: var(--neon-cyan);
+      color: #000000;
+      border: none;
+      padding: 13px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      border-radius: var(--button-radius);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+
+    body.extreme-contrast .btn-action {
+      background: #ffffff !important;
+      color: #000000 !important;
+      font-weight: 900;
+    }
+
+    /* ==========================================================================
+       JUEGO 2: MATRIZ Y ESCALAFÓN DE ATACANTES
+       ========================================================================== */
+    .matrix-intro {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .matrix-subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .matrix-subtab-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: var(--button-radius);
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .matrix-subtab-btn.active {
+      background: var(--surface-2);
+      border-color: var(--neon-yellow);
+      color: var(--neon-yellow);
+    }
+
+    /* ORDENACIÓN POR SOFISTICACIÓN (DRAG/TAP SORT) */
+    .sort-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sort-item {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      border-radius: var(--card-radius);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s ease, background 0.2s;
+    }
+
+    .sort-rank {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      color: var(--neon-cyan);
+      font-weight: 900;
+      font-family: monospace;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sort-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sort-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .sort-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .sort-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .sort-btn-arrow {
+      background: var(--surface-2);
+      border: var(--border-contrast);
+      color: var(--text-main);
+      width: 34px;
+      height: 30px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .sort-btn-arrow:active {
+      background: var(--neon-cyan);
+      color: #000;
+    }
+
+    /* MATRIZ RECUADRO INTERACTIVA / MATCHING */
+    .matrix-challenge-card {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      border-radius: var(--card-radius);
+      padding: 16px;
+    }
+
+    .attacker-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .matrix-grid-view {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .matrix-cell {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+
+    .matrix-cell-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--neon-yellow);
+      margin-bottom: 2px;
+    }
+
+    /* ==========================================================================
+       SECCIÓN 3: DICCIONARIO / GLOSARIO DE ESTUDIO
+       ========================================================================== */
+    .search-box-wrapper {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      color: var(--text-main);
+      padding: 12px 38px 12px 14px;
+      border-radius: var(--button-radius);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .search-input:focus {
+      border-color: var(--neon-cyan);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .filter-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--neon-cyan);
+      color: #000;
+      border-color: var(--neon-cyan);
+    }
+
+    body.extreme-contrast .filter-pill.active {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+
+    .dictionary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dict-card {
+      background: var(--surface-1);
+      border: var(--border-contrast);
+      border-radius: var(--card-radius);
+      padding: 14px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .dict-term {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--neon-cyan);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    body.extreme-contrast .dict-term {
+      color: #ffffff !important;
+      text-decoration: underline;
+    }
+
+    .dict-category {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--neon-yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .dict-def {
+      font-size: 0.84rem;
+      color: var(--text-main);
+      line-height: 1.42;
+      margin-bottom: 6px;
+    }
+
+    .dict-exam-tip {
+      background: #000;
+      border-left: 3px solid var(--neon-yellow);
+      padding: 6px 8px;
+      font-size: 0.74rem;
+      color: #e0e6ed;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* PANTALLA DE RESULTADOS */
+    .results-card {
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .results-emoji {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .results-score {
+      font-size: 2.2rem;
+      font-weight: 900;
+      font-family: monospace;
+      color: var(--neon-green);
+      margin-bottom: 6px;
+    }
+
+    .results-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* TOAST ALERT */
+    .toast {
+      position: fixed;
+      bottom: 74px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #111;
+      border: 1px solid var(--neon-cyan);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       CABECERA CON CONTROLES DE TIPOGRAFÍA (--A, -A, A, A+, A++) Y CONTRASTE
+       ======================================================================== -->
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <div class="brand-title">CYBER THREATS</div>
+        <div class="brand-sub">OLED Study System</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <!-- Selector de tamaño de letra en ciclo: --A, -A, A, A+, A++ -->
+      <button id="btn-font" class="btn-pill" title="Cambiar tamaño de fuente">A</button>
+      
+      <!-- Conmutador de Contraste Extremo -->
+      <button id="btn-contrast" class="btn-pill" title="Modo Contraste Extremo">
+        <span>👁️‍🗨️</span> Contraste
+      </button>
+
+      <!-- Conmutador de Sonido -->
+      <button id="btn-sound" class="btn-pill" title="Activar/Desactivar sonido">🔊</button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTENIDO PRINCIPAL DINÁMICO
+       ======================================================================== -->
+  <main>
+
+    <!-- ======================================================================
+         PESTAÑA 1: JUEGO 1 - DESAFÍO DE CONCEPTOS (ALEATORIO SIN REPETICIÓN)
+         ====================================================================== -->
+    <section id="tab-game1" class="tab-section active">
+      
+      <!-- HUD DE ESTADÍSTICAS -->
+      <div class="hud-bar">
+        <div class="hud-stat">
+          <div class="hud-stat-value" id="hud-score">0</div>
+          <div class="hud-stat-label">Puntos</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-value" id="hud-streak">0x</div>
+          <div class="hud-stat-label">Racha</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-value" id="hud-progress">0/0</div>
+          <div class="hud-stat-label">Pregunta</div>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-bar"></div>
+      </div>
+
+      <!-- TARJETA PRINCIPAL DEL JUEGO 1 -->
+      <div class="card" id="quiz-container">
+        <div class="card-header">
+          <span class="badge badge-cyan" id="q-category">Tema 1</span>
+          <span class="badge badge-yellow" id="q-difficulty">Concepto Clave</span>
+        </div>
+
+        <!-- Diagrama del Flujo de Seguridad cuando sea relevante -->
+        <div id="q-flow-diagram" class="flow-diagram" style="display: none;">
+          <span>Amenaza</span> ➔ <span>Explota</span> ➔ <span>Vulnerabilidad</span> ➔ <span>Afecta</span> ➔ <span>Activo</span> ➔ <span>Provoca</span> ➔ <span>Impacto</span>
+        </div>
+
+        <div class="question-box" id="q-text">Cargando desafío cibernético...</div>
+
+        <div class="options-grid" id="q-options">
+          <!-- Opciones renderizadas con JavaScript -->
+        </div>
+
+        <div class="feedback-box" id="q-feedback"></div>
+
+        <button class="btn-action" id="btn-next" style="display: none;">
+          Siguiente Desafío ➔
+        </button>
+      </div>
+
+      <!-- TARJETA FINAL DE RESULTADOS (OCULTA INICIALMENTE) -->
+      <div class="card results-card" id="results-container" style="display: none;">
+        <div class="results-emoji" id="res-emoji">🏆</div>
+        <div class="results-score" id="res-score">100%</div>
+        <div class="results-desc" id="res-desc">¡Ronda completada con éxito!</div>
+        <button class="btn-action" id="btn-restart">🔄 Jugar Otra Ronda Aleatoria</button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PESTAÑA 2: JUEGO 2 - RECUADRO Y ORDENACIÓN DE ATACANTES
+         ====================================================================== -->
+    <section id="tab-game2" class="tab-section">
+      
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-purple">Recuadro Oficial</span>
+          <span class="badge badge-yellow">Sofisticación y Defensa</span>
+        </div>
+        <div class="matrix-intro">
+          Ordena los perfiles de atacante según su <strong>nivel de sofisticación y recursos (de Menor ↓ a Mayor ↓)</strong>, o pon a prueba el enfoque de defensa empresarial correspondiente.
+        </div>
+      </div>
+
+      <!-- SUB-MODOS DE JUEGO 2 -->
+      <div class="matrix-subtabs">
+        <button class="matrix-subtab-btn active" id="subtab-sort">1. Ordenar Escalafón</button>
+        <button class="matrix-subtab-btn" id="subtab-match">2. Reto: Enfoque Defensivo</button>
+      </div>
+
+      <!-- VISTA SUBMODO 1: ORDENAR DE MENOR A MAYOR -->
+      <div id="matrix-sort-view">
+        <div class="sort-list" id="sortable-attacker-list">
+          <!-- Renderizado dinámicamente -->
+        </div>
+
+        <button class="btn-action" id="btn-check-order" style="margin-top: 14px;">
+          ✅ Comprobar Orden de Sofisticación
+        </button>
+
+        <div class="feedback-box" id="order-feedback" style="margin-top: 12px;"></div>
+      </div>
+
+      <!-- VISTA SUBMODO 2: RETO MATCHING DE ENFOQUE DEFENSIVO -->
+      <div id="matrix-match-view" style="display: none;">
+        <div class="matrix-challenge-card" id="matrix-match-container">
+          <!-- Renderizado con JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PESTAÑA 3: DICCIONARIO / GLOSARIO DE ESTUDIO COMPLETO
+         ====================================================================== -->
+    <section id="tab-dictionary" class="tab-section">
+      
+      <!-- BUSCADOR INSTANTÁNEO -->
+      <div class="search-box-wrapper">
+        <input 
+          type="search" 
+          id="dict-search" 
+          class="search-input" 
+          placeholder="🔍 Buscar concepto (ej: Vulnerabilidad, APT, CID...)" 
+          autocomplete="off"
+        />
+        <button id="dict-search-clear" class="search-clear">✕</button>
+      </div>
+
+      <!-- FILTROS POR CATEGORÍA -->
+      <div class="filter-pills" id="dict-filters">
+        <button class="filter-pill active" data-cat="all">Todos</button>
+        <button class="filter-pill" data-cat="riesgo">Gestión Riesgos</button>
+        <button class="filter-pill" data-cat="atacantes">Atacantes</button>
+        <button class="filter-pill" data-cat="amenazas">Tipos Amenaza</button>
+        <button class="filter-pill" data-cat="cti">Ciberinteligencia</button>
+        <button class="filter-pill" data-cat="intercambio">Intercambio</button>
+      </div>
+
+      <!-- LISTADO DE TÉRMINOS -->
+      <div class="dictionary-list" id="dict-list">
+        <!-- Renderizado dinámicamente -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       BARRA DE NAVEGACIÓN INFERIOR (ERGONOMÍA MÓVIL TOTAL)
+       ======================================================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="tab-game1">
+      <span class="nav-icon">🎯</span>
+      <span>Conceptos</span>
+    </button>
+    <button class="nav-item" data-target="tab-game2">
+      <span class="nav-icon">⚔️</span>
+      <span>Atacantes</span>
+    </button>
+    <button class="nav-item" data-target="tab-dictionary">
+      <span class="nav-icon">📖</span>
+      <span>Diccionario</span>
+    </button>
+  </nav>
+
+  <!-- TOAST NOTIFICACIÓN -->
+  <div class="toast" id="toast">Notificación</div>
+
+  <!-- ========================================================================
+       LÓGICA JAVASCRIPT DEL JUEGO Y AUDIO SYNTHESIZER
+       ======================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. MOTOR DE AUDIO Y HÁPTICA (WEB AUDIO API - 100% AUTÓNOMO)
+       ========================================================================== */
+    const SoundEngine = {
+      enabled: true,
+      ctx: null,
+
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+
+      playTone(freq, type, duration, delay = 0) {
+        if (!this.enabled) return;
+        try {
+          this.init();
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + delay + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + delay);
+          osc.stop(this.ctx.currentTime + delay + duration);
+        } catch(e) {}
+      },
+
+      tap() {
+        this.playTone(480, 'sine', 0.05);
+        this.vibrate(15);
+      },
+
+      correct() {
+        this.playTone(523.25, 'triangle', 0.08, 0);       // C5
+        this.playTone(659.25, 'triangle', 0.12, 0.08);    // E5
+        this.playTone(783.99, 'triangle', 0.18, 0.16);    // G5
+        this.vibrate([25, 40, 50]);
+      },
+
+      wrong() {
+        this.playTone(220, 'sawtooth', 0.15, 0);
+        this.playTone(174, 'sawtooth', 0.22, 0.1);
+        this.vibrate([80, 40, 80]);
+      },
+
+      levelUp() {
+        this.playTone(440, 'sine', 0.08, 0);
+        this.playTone(554, 'sine', 0.08, 0.08);
+        this.playTone(659, 'sine', 0.08, 0.16);
+        this.playTone(880, 'sine', 0.25, 0.24);
+        this.vibrate([40, 40, 80, 40, 100]);
+      },
+
+      vibrate(pattern) {
+        if ("vibrate" in navigator) {
+          try { navigator.vibrate(pattern); } catch(e) {}
+        }
+      }
+    };
+
+    /* ==========================================================================
+       2. CONTROLES DE TAMAÑO DE FUENTE (--A, -A, A, A+, A++) Y CONTRASTE EXTREMO
+       ========================================================================== */
+    const fontSizes = [
+      { label: "--A", size: "13px" },
+      { label: "-A",  size: "14.5px" },
+      { label: "A",   size: "16px" },
+      { label: "A+",  size: "18px" },
+      { label: "A++", size: "20.5px" }
+    ];
+
+    let currentFontIndex = 2; // Default "A" (16px)
+
+    const btnFont = document.getElementById("btn-font");
+    const btnContrast = document.getElementById("btn-contrast");
+    const btnSound = document.getElementById("btn-sound");
+    const toastEl = document.getElementById("toast");
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
+
+    btnFont.addEventListener("click", () => {
+      SoundEngine.tap();
+      currentFontIndex = (currentFontIndex + 1) % fontSizes.length;
+      const current = fontSizes[currentFontIndex];
+      document.documentElement.style.setProperty("--font-scale", current.size);
+      btnFont.textContent = current.label;
+      showToast(`Tamaño fuente: ${current.label} (${current.size})`);
+      localStorage.setItem("cyber_font_idx", currentFontIndex);
+    });
+
+    btnContrast.addEventListener("click", () => {
+      SoundEngine.tap();
+      document.body.classList.toggle("extreme-contrast");
+      const isActive = document.body.classList.contains("extreme-contrast");
+      btnContrast.classList.toggle("active", isActive);
+      showToast(isActive ? "Contraste Extremo ACTIVADO" : "Contraste Normal");
+      localStorage.setItem("cyber_contrast", isActive ? "1" : "0");
+    });
+
+    btnSound.addEventListener("click", () => {
+      SoundEngine.enabled = !SoundEngine.enabled;
+      btnSound.textContent = SoundEngine.enabled ? "🔊" : "🔇";
+      showToast(SoundEngine.enabled ? "Sonido Activado" : "Sonido Silenciado");
+      if (SoundEngine.enabled) SoundEngine.tap();
+    });
+
+    // Cargar preferencias guardadas
+    const savedFont = localStorage.getItem("cyber_font_idx");
+    if (savedFont !== null) {
+      currentFontIndex = parseInt(savedFont, 10);
+      if (fontSizes[currentFontIndex]) {
+        document.documentElement.style.setProperty("--font-scale", fontSizes[currentFontIndex].size);
+        btnFont.textContent = fontSizes[currentFontIndex].label;
+      }
+    }
+    if (localStorage.getItem("cyber_contrast") === "1") {
+      document.body.classList.add("extreme-contrast");
+      btnContrast.classList.add("active");
+    }
+
+    /* ==========================================================================
+       3. NAVEGACIÓN ENTRE SECCIONES (TABS)
+       ========================================================================== */
+    const navItems = document.querySelectorAll(".nav-item");
+    const tabSections = document.querySelectorAll(".tab-section");
+
+    navItems.forEach(item => {
+      item.addEventListener("click", () => {
+        SoundEngine.tap();
+        navItems.forEach(n => n.classList.remove("active"));
+        tabSections.forEach(t => t.classList.remove("active"));
+        item.classList.add("active");
+        const target = item.getAttribute("data-target");
+        document.getElementById(target).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    /* ==========================================================================
+       4. BASE DE DATOS DE PREGUNTAS (JUEGO 1 - COBERTURA COMPLETA APUNTES)
+       ========================================================================== */
+    const ALL_QUESTIONS = [
+      {
+        category: "1.1 Flujo de Seguridad",
+        difficulty: "Esencial",
+        showFlow: true,
+        question: "¿Cuál es la relación estructural y secuencial del flujo fundamental de seguridad?",
+        options: [
+          "Amenaza → Explota → Vulnerabilidad → Afecta → Activo → Provoca → Impacto",
+          "Activo → Provoca → Amenaza → Explota → Vulnerabilidad → Provoca → Impacto",
+          "Vulnerabilidad → Genera → Amenaza → Destruye → Activo → Provoca → Riesgo",
+          "Amenaza → Bloquea → Control → Transforma → Activo → Provoca → Vulnerabilidad"
+        ],
+        correct: 0,
+        explanation: "La relación causa-efecto fundamental es: Una Amenaza EXPLOTA una Vulnerabilidad, lo cual AFECTA a un Activo de la organización, PROVOCANDO finalmente un Impacto."
+      },
+      {
+        category: "1.1 Concepto de Activo",
+        difficulty: "Definición",
+        question: "¿Cómo se define formalmente un 'Activo' en la gestión de riesgos?",
+        options: [
+          "Cualquier recurso imprescindible de la organización cuyo deterioro o no disponibilidad implica un agravio o coste económico.",
+          "Únicamente los servidores físicos y ordenadores portátiles de los directivos.",
+          "Cualquier circunstancia externa involuntaria como un desastre natural.",
+          "Un fallo de programación en aplicaciones no actualizadas."
+        ],
+        correct: 0,
+        explanation: "Un activo comprende bienes, derechos y recursos controlados por la empresa para generar rendimientos futuros, cuya indisponibilidad genera perjuicio o coste."
+      },
+      {
+        category: "1.1 Vulnerabilidades",
+        difficulty: "Clasificación",
+        question: "Respecto a los fallos de implementación (bugs), ¿cuándo adquieren relevancia en ciberseguridad?",
+        options: [
+          "Solo aquellos bugs que son explotables por un usuario malintencionado.",
+          "Todos los bugs sin excepción tienen impacto directo en ciberseguridad.",
+          "Solo cuando provocan el reinicio forzado del sistema operativo.",
+          "Únicamente si ocurren en el software de contabilidad."
+        ],
+        correct: 0,
+        explanation: "No todos los bugs son vulnerabilidades; únicamente aquellos fallos prácticos de implementación que pueden ser explotados maliciosamente adquieren relevancia en seguridad (ej. SQLi, XSS, desbordamiento de búfer)."
+      },
+      {
+        category: "1.1 Origen de Fallos",
+        difficulty: "Clasificación",
+        question: "Una debilidad originada habitualmente por instalaciones por defecto que activan servicios innecesarios se clasifica como:",
+        options: [
+          "Fallo de configuración",
+          "Fallo de diseño estructural",
+          "Fallo de implementación (bug)",
+          "Ataque de abrevadero"
+        ],
+        correct: 0,
+        explanation: "Los fallos de configuración derivan habitualmente de instalaciones por defecto que dejan expuestos o activos servicios innecesarios no utilizados."
+      },
+      {
+        category: "1.1 Riesgo y Estimación",
+        difficulty: "Fórmula Clave",
+        question: "¿Cómo se valora y estima el 'Riesgo' en ciberseguridad?",
+        options: [
+          "En función de la probabilidad de que una amenaza ocurra combinada con el posible impacto que causaría.",
+          "Multiplicando el número de ordenadores por el precio de los antivirus.",
+          "Sumando únicamente los costes de los cortafuegos y copias de seguridad.",
+          "Evaluando exclusivamente la frecuencia histórica sin considerar el impacto."
+        ],
+        correct: 0,
+        explanation: "El riesgo es la estimación valorada combinando la probabilidad de ocurrencia de la amenaza con la severidad del impacto resultante sobre los activos."
+      },
+      {
+        category: "1.2 Tipos de Amenazas (ENISA)",
+        difficulty: "Criterios ETL",
+        question: "Según el informe ENISA Threat Landscape (ETL), ¿cuáles son los dos factores clave que determinan la relevancia de una amenaza?",
+        options: [
+          "La frecuencia y el impacto.",
+          "El país de origen y el sistema operativo afectado.",
+          "La marca del cortafuegos y el número de analistas del SOC.",
+          "El coste de la licencia del software afectado."
+        ],
+        correct: 0,
+        explanation: "La frecuencia y el impacto son los factores determinantes para establecer la relevancia y prominencia dentro del panorama global de amenazas de ENISA."
+      },
+      {
+        category: "1.2 Amenazas ENISA",
+        difficulty: "Ransomware",
+        question: "Sobre el Ransomware, ¿qué porcentaje estimado de organizaciones afectadas podrían haber pagado los rescates requeridos según el informe?",
+        options: [
+          "Hasta el 60 % de las organizaciones afectadas.",
+          "Menos del 5 % de las organizaciones.",
+          "Exactamente el 100 % de las víctimas.",
+          "Apenas un 15 % debido a las directivas bancarias."
+        ],
+        correct: 0,
+        explanation: "El informe destaca que hasta el 60% de las organizaciones afectadas por ransomware podrían haber cedido al pago del rescate exigido para liberar sus datos cifrados."
+      },
+      {
+        category: "1.2 Amenazas Web",
+        difficulty: "Técnicas Web",
+        question: "¿Qué técnica web consiste en comprometer sitios legítimos muy frecuentados por las víctimas previstas para infectarlas?",
+        options: [
+          "Ataque de abrevadero (Watering hole)",
+          "Secuestro de formularios (Formjacking)",
+          "Descarga involuntaria (Drive-by)",
+          "Manipulación de información"
+        ],
+        correct: 0,
+        explanation: "El ataque de abrevadero (Watering hole) compromete sitios de internet frecuentados habitualmente por el grupo o sector objetivo para descargar malware."
+      },
+      {
+        category: "1.2 Defensa Avanzada",
+        difficulty: "Tendencias",
+        question: "¿Qué dos estrategias avanzadas de defensa han logrado mejoras significativas para reducir el impacto de ataques complejos?",
+        options: [
+          "Arquitecturas Zero Trust (confianza cero) y herramientas basadas en Inteligencia Artificial.",
+          "Antivirus tradicionales por firmas y contraseñas de 8 caracteres.",
+          "Aislar físicamente todos los servidores de la empresa sin conexión a red.",
+          "Eliminar todos los accesos VPN y permitir solo protocolos HTTP sin cifrar."
+        ],
+        correct: 0,
+        explanation: "Zero Trust ('nunca confiar, siempre verificar') junto al análisis predictivo de la Inteligencia Artificial constituyen la vanguardia defensiva frente a amenazas dinámicas."
+      },
+      {
+        category: "1.3 Perfiles de Atacantes",
+        difficulty: "Motivación",
+        question: "¿Cuál es la motivación primordial y los métodos típicos de los 'Criminales organizados'?",
+        options: [
+          "Beneficio económico directo mediante fraude y extorsión (troyanos, ransomware).",
+          "Curiosidad o malicia simple alterando visualmente webs (defacement).",
+          "Reivindicación política o humillación pública mediante DoS.",
+          "Cibersabotaje diplomático a infraestructuras críticas nacionales."
+        ],
+        correct: 0,
+        explanation: "Los criminales organizados actúan movidos por el lucro económico directo a gran escala recurriendo a troyanos, fraude bancario y campañas de ransomware."
+      },
+      {
+        category: "1.3 Enfoque Defensivo",
+        difficulty: "Regla Crucial",
+        question: "Frente a grupos APT y ataques patrocinados por Estados, ¿dónde se concentran prioritariamente los esfuerzos defensivos de las empresas?",
+        options: [
+          "En la capacidad de detección temprana y reacción/respuesta rápida.",
+          "En la prevención total pasiva cerrando los puertos del router.",
+          "En ignorar la amenaza por considerarse inevitable sin respuesta.",
+          "Únicamente en contratar pólizas de seguros sin monitorización."
+        ],
+        correct: 0,
+        explanation: "Mientras que en niveles bajos basta prevenir y reaccionar de forma estándar, ante APTs y Estados se asume que pueden penetrar el perímetro: la prioridad vital es la detección y reacción inmediata."
+      },
+      {
+        category: "1.4 Tríada CID y Marco",
+        difficulty: "Estructura Normativa",
+        question: "En el marco normativo interno de seguridad, ¿cuáles son los 4 niveles jerárquicos ordenados de mayor a menor generalidad?",
+        options: [
+          "Política ➔ Estándar ➔ Línea base (baseline) ➔ Procedimiento",
+          "Procedimiento ➔ Línea base ➔ Estándar ➔ Política",
+          "Línea base ➔ Directriz ➔ Contrato ➔ Ley orgánica",
+          "Política ➔ Auditoría ➔ Certificación ➔ Sanción"
+        ],
+        correct: 0,
+        explanation: "Las Políticas dan las directrices generales, los Estándares fijan requisitos específicos uniformes, las Líneas Base definen mínimos obligatorios y los Procedimientos detallan el paso a paso práctico."
+      },
+      {
+        category: "1.4 Evaluación de Riesgos",
+        difficulty: "Fases",
+        question: "¿Cuál de las siguientes preguntas pertenece a la 'Fase de análisis y evaluación' y NO a la de gestión?",
+        options: [
+          "¿Con qué frecuencia puede ocurrir? (Estimación de probabilidad)",
+          "¿Cuánto va a costar mitigarlo?",
+          "¿Qué puede hacer la organización al respecto?",
+          "¿Es rentable mitigarlo o es asumible la pérdida?"
+        ],
+        correct: 0,
+        explanation: "El análisis evalúa: ¿Qué podría suceder?, ¿Cuán perjudicial es?, ¿Con qué frecuencia puede ocurrir? y ¿Cuán seguros estamos? El coste, rentabilidad y acciones corresponden a la fase de gestión y toma de decisiones."
+      },
+      {
+        category: "1.4 Riesgo Inherente vs Residual",
+        difficulty: "Norma ISO 17799",
+        question: "¿Qué es el 'Riesgo Residual'?",
+        options: [
+          "El nivel de riesgo resultante tras aplicar las contramedidas y controles adecuados.",
+          "El nivel de exposición previo a adoptar cualquier tipo de medida o salvaguarda.",
+          "El valor total en euros de los activos que no están conectados a Internet.",
+          "La pérdida provocada por ataques cometidos únicamente por empleados internos."
+        ],
+        correct: 0,
+        explanation: "El riesgo inherente es el previo a toda medida. Tras aplicar controles, queda el riesgo residual, que la organización debe decidir asumir o externalizar (ej. seguro)."
+      },
+      {
+        category: "1.5 Cyber Threat Intelligence",
+        difficulty: "Atributos Esenciales",
+        question: "¿Cuáles son los 4 atributos indispensables que debe cumplir la ciberinteligencia para ser útil?",
+        options: [
+          "Oportuna, Precisa, Procesable y Relevante.",
+          "Pública, Gratuita, Masiva y Descentralizada.",
+          "Compleja, Cifrada, Militar y Automática.",
+          "Histórica, Teórica, Preventiva y Global."
+        ],
+        correct: 0,
+        explanation: "La inteligencia de amenazas debe ser: Oportuna (a tiempo), Precisa (verídica), Procesable (accionable para la defensa) y Relevante (útil al contexto de la empresa)."
+      },
+      {
+        category: "1.5 Tríada del Análisis CTI",
+        difficulty: "Estructura CTI",
+        question: "En ciberinteligencia, la tríada del análisis está compuesta por:",
+        options: [
+          "Actores, Intención/Capacidad, y TTP (Tácticas, Técnicas y Procedimientos) con sus motivaciones.",
+          "Confidencialidad, Integridad y Disponibilidad.",
+          "Política, Estándar y Procedimiento.",
+          "Hashes, Direcciones IP y Nombres de Dominio maliciosos."
+        ],
+        correct: 0,
+        explanation: "El análisis riguroso de CTI relaciona a los Actores (quién), su Intención y Capacidad (qué buscan y qué recursos tienen) y sus TTPs (cómo lo ejecutan)."
+      },
+      {
+        category: "1.5 Niveles de Inteligencia",
+        difficulty: "Taxonomía CTI",
+        question: "¿A qué nivel corresponde la inteligencia enfocada en la respuesta inmediata en tiempo real mediante indicadores de compromiso (IoC como IPs, hashes o dominios)?",
+        options: [
+          "Inteligencia táctica",
+          "Inteligencia estratégica",
+          "Inteligencia operativa o técnica",
+          "Inteligencia legislativa"
+        ],
+        correct: 0,
+        explanation: "La Inteligencia Táctica atiende la operativa diaria en tiempo real mediante IoCs inmediatos (hashes, IPs maliciosas). La Operativa/Técnica analiza campañas e informes forenses, y la Estratégica asesora a directivos a largo plazo."
+      },
+      {
+        category: "1.6 Intercambio de Información",
+        difficulty: "Fases del Flujo",
+        question: "¿Cuál es el orden secuencial de las 5 etapas del flujo de procesamiento para la agregación de ciberinteligencia?",
+        options: [
+          "1. Agregación ➔ 2. Enriquecimiento ➔ 3. Filtrado ➔ 4. Categorización ➔ 5. Entrega",
+          "1. Entrega ➔ 2. Filtrado ➔ 3. Agregación ➔ 4. Categorización ➔ 5. Cifrado",
+          "1. Categorización ➔ 2. Agregación ➔ 3. Entrega ➔ 4. Filtrado ➔ 5. Enriquecimiento",
+          "1. Enriquecimiento ➔ 2. Agregación ➔ 3. Categorización ➔ 4. Filtrado ➔ 5. Entrega"
+        ],
+        correct: 0,
+        explanation: "El flujo de datos estructurado consta de: 1. Agregación de múltiples fuentes ➔ 2. Enriquecimiento contextual ➔ 3. Filtrado de ruido ➔ 4. Categorización según criticidad ➔ 5. Entrega a analistas y herramientas."
+      },
+      {
+        category: "1.6 Estándares y Automatización",
+        difficulty: "Estándares",
+        question: "¿Qué protocolos y plataformas se destacan en el temario para el intercambio automatizado de inteligencia de ciberamenazas?",
+        options: [
+          "Estándares STIX/TAXII y la plataforma nacional CCN-LUCIA.",
+          "Protocolos FTP anónimo y correo electrónico PGP.",
+          "Hojas de cálculo Excel compartidas por Google Drive.",
+          "Mensajería WhatsApp Web y canales de IRC no cifrados."
+        ],
+        correct: 0,
+        explanation: "Para intercambiar inteligencia procesable por máquinas a gran escala se emplean estándares internacionales como STIX/TAXII y herramientas nacionales especializadas como CCN-LUCIA."
+      },
+      {
+        category: "1.3 Clasificación de Incidentes",
+        difficulty: "Taxonomía ENS",
+        question: "En el contexto español, ¿qué entidad y marco de referencia definen la taxonomía oficial para la clasificación de ciberincidentes?",
+        options: [
+          "El CCN-CERT en el marco del Esquema Nacional de Seguridad (ENS).",
+          "La Agencia Tributaria en el marco de la Ley de Sociedades.",
+          "El Ministerio de Educación en el marco del Plan Bolonia.",
+          "El Instituto Nacional de Estadística (INE)."
+        ],
+        correct: 0,
+        explanation: "En España, la taxonomía oficial de incidentes de seguridad de la información está establecida por el CCN-CERT en el ámbito del Esquema Nacional de Seguridad (ENS)."
+      }
+    ];
+
+    /* ==========================================================================
+       5. LÓGICA DEL JUEGO 1: DESAFÍO ALEATORIO SIN REPETICIÓN
+       ========================================================================== */
+    let shuffledQueue = [];
+    let currentQuestionIdx = 0;
+    let score = 0;
+    let streak = 0;
+    let bestStreak = 0;
+    let questionAnswered = false;
+
+    // Algoritmo Fisher-Yates para mezcla sin sesgo
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function initGame1() {
+      shuffledQueue = shuffleArray(ALL_QUESTIONS);
+      currentQuestionIdx = 0;
+      score = 0;
+      streak = 0;
+      updateHUD();
+      document.getElementById("quiz-container").style.display = "block";
+      document.getElementById("results-container").style.display = "none";
+      loadQuestion();
+    }
+
+    function updateHUD() {
+      document.getElementById("hud-score").textContent = score;
+      document.getElementById("hud-streak").textContent = `${streak}x`;
+      document.getElementById("hud-progress").textContent = `${currentQuestionIdx + 1}/${shuffledQueue.length}`;
+      const pct = (currentQuestionIdx / shuffledQueue.length) * 100;
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+    }
+
+    function loadQuestion() {
+      if (currentQuestionIdx >= shuffledQueue.length) {
+        finishGame1();
+        return;
+      }
+
+      questionAnswered = false;
+      const q = shuffledQueue[currentQuestionIdx];
+      updateHUD();
+
+      document.getElementById("q-category").textContent = q.category;
+      document.getElementById("q-difficulty").textContent = q.difficulty;
+      document.getElementById("q-text").textContent = q.question;
+
+      // Mostrar u ocultar el diagrama de flujo si aplica
+      document.getElementById("q-flow-diagram").style.display = q.showFlow ? "flex" : "none";
+
+      const feedbackEl = document.getElementById("q-feedback");
+      feedbackEl.className = "feedback-box";
+      feedbackEl.textContent = "";
+
+      const btnNext = document.getElementById("btn-next");
+      btnNext.style.display = "none";
+
+      // Barajar opciones manteniendo referencia a la correcta
+      const optionsContainer = document.getElementById("q-options");
+      optionsContainer.innerHTML = "";
+
+      const optionsWithIndices = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
+      const shuffledOptions = shuffleArray(optionsWithIndices);
+
+      const letters = ["A", "B", "C", "D"];
+
+      shuffledOptions.forEach((item, pos) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <div class="option-indicator">${letters[pos]}</div>
+          <div>${item.text}</div>
+        `;
+        btn.addEventListener("click", () => handleAnswer(item.originalIndex, q.correct, q.explanation, btn));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIndex, correctIndex, explanation, clickedBtn) {
+      if (questionAnswered) return;
+      questionAnswered = true;
+
+      const optionButtons = document.querySelectorAll(".option-btn");
+      optionButtons.forEach(btn => btn.style.pointerEvents = "none");
+
+      const feedbackEl = document.getElementById("q-feedback");
+      const btnNext = document.getElementById("btn-next");
+
+      if (selectedIndex === correctIndex) {
+        SoundEngine.correct();
+        clickedBtn.classList.add("correct");
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        const streakBonus = Math.min(streak * 20, 100);
+        score += (100 + streakBonus);
+
+        feedbackEl.className = "feedback-box correct show";
+        feedbackEl.innerHTML = `<strong>¡Excelente! (+${100 + streakBonus} pts)</strong><br>${explanation}`;
+      } else {
+        SoundEngine.wrong();
+        clickedBtn.classList.add("wrong");
+        streak = 0;
+
+        // Marcar la respuesta correcta para aprendizaje visual
+        optionButtons.forEach(btn => {
+          if (btn.textContent.includes(shuffledQueue[currentQuestionIdx].options[correctIndex])) {
+            btn.classList.add("correct");
+          }
+        });
+
+        feedbackEl.className = "feedback-box wrong show";
+        feedbackEl.innerHTML = `<strong>Atención: Concepto Clave</strong><br>${explanation}`;
+      }
+
+      updateHUD();
+      btnNext.style.display = "flex";
+      btnNext.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      SoundEngine.tap();
+      currentQuestionIdx++;
+      loadQuestion();
+    });
+
+    function finishGame1() {
+      SoundEngine.levelUp();
+      document.getElementById("quiz-container").style.display = "none";
+      const results = document.getElementById("results-container");
+      results.style.display = "block";
+
+      const maxPossible = shuffledQueue.length * 150;
+      const pct = Math.round((score / maxPossible) * 100);
+
+      document.getElementById("res-score").textContent = `${score} Puntos`;
+      document.getElementById("res-desc").innerHTML = `
+        Completaste las <strong>${shuffledQueue.length}</strong> preguntas del tema.<br>
+        Mejor racha consecutiva: <strong>${bestStreak}</strong> aciertos.<br>
+        ¡Todo el temario fijado en tu memoria activa!
+      `;
+    }
+
+    document.getElementById("btn-restart").addEventListener("click", () => {
+      SoundEngine.tap();
+      initGame1();
+    });
+
+    /* ==========================================================================
+       6. LÓGICA DEL JUEGO 2: RECUADRO Y ORDENACIÓN DE ATACANTES (APARTADO 1.3)
+       ========================================================================== */
+    // Perfiles exactos según el recuadro oficial de menor a mayor sofisticación
+    const ATTACKERS_DATA = [
+      {
+        id: 1,
+        rank: 1,
+        levelText: "Menor Sofisticación (Nivel 1)",
+        name: "Atacantes oportunistas / por hobby",
+        quien: "Oportunistas / Script kiddies",
+        motivacion: "Curiosidad, malicia simple.",
+        metodos: "Hacking ocasional, alteración visual de sitios web (defacement).",
+        defensa: "Prevenir, detectar y reaccionar",
+        defensaDetalle: "La mayoría de las empresas reconoce la necesidad de cubrir el ciclo completo de protección ante este nivel.",
+        isAdvanced: false
+      },
+      {
+        id: 2,
+        rank: 2,
+        levelText: "Sofisticación Media-Baja (Nivel 2)",
+        name: "Hacktivistas (ej. Anonymous)",
+        quien: "Grupos ideológicos / Hacktivistas",
+        motivacion: "Disrupción, humillación o reivindicación política.",
+        metodos: "Denegaciones de servicio (DoS), brechas de seguridad.",
+        defensa: "Prevenir, detectar y reaccionar",
+        defensaDetalle: "Enfoque preventivo y reactivo estándar.",
+        isAdvanced: false
+      },
+      {
+        id: 3,
+        rank: 3,
+        levelText: "Sofisticación Media (Nivel 3)",
+        name: "Criminales organizados",
+        quien: "Bandas de cibercrimen financiero",
+        motivacion: "Beneficio económico a través de fraude y extorsión.",
+        metodos: "Malware, troyanos, ransomware.",
+        defensa: "Prevenir, detectar y reaccionar",
+        defensaDetalle: "Enfoque preventivo y reactivo estándar frente a delincuencia económica común.",
+        isAdvanced: false
+      },
+      {
+        id: 4,
+        rank: 4,
+        levelText: "Sofisticación Alta (Nivel 4)",
+        name: "Amenazas Persistentes Avanzadas (APT)",
+        quien: "Grupos APT con alta persistencia",
+        motivacion: "Robo de propiedad intelectual, beneficio económico a través de espionaje corporativo.",
+        metodos: "Malware altamente dirigido, espionaje corporativo y técnicas avanzadas.",
+        defensa: "Detectar y reaccionar",
+        defensaDetalle: "La prioridad defensiva se concentra en la capacidad de detección temprana y respuesta rápida.",
+        isAdvanced: true
+      },
+      {
+        id: 5,
+        rank: 5,
+        levelText: "Mayor Sofisticación (Nivel 5)",
+        name: "Ataques patrocinados por gobiernos (Estados-nación)",
+        quien: "Agencias estatales / Militares",
+        motivacion: "Disrupción de infraestructuras críticas, cibersabotaje, espionaje diplomático.",
+        metodos: "Cibersabotaje, espionaje diplomático y operaciones complejas avanzadas.",
+        defensa: "Detectar y reaccionar",
+        defensaDetalle: "Prioridad focalizada en la detección y reacción inmediata ante incidentes avanzados.",
+        isAdvanced: true
+      }
+    ];
+
+    let currentOrderState = [];
+
+    function initAttackerSortGame() {
+      // Barajar el orden inicial para obligar al usuario a ordenar
+      do {
+        currentOrderState = shuffleArray(ATTACKERS_DATA);
+      } while (isAlreadySorted(currentOrderState));
+
+      renderSortList();
+      document.getElementById("order-feedback").className = "feedback-box";
+      document.getElementById("order-feedback").textContent = "";
+    }
+
+    function isAlreadySorted(arr) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].rank !== i + 1) return false;
+      }
+      return true;
+    }
+
+    function renderSortList() {
+      const container = document.getElementById("sortable-attacker-list");
+      container.innerHTML = "";
+
+      currentOrderState.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "sort-item";
+        row.innerHTML = `
+          <div class="sort-rank">#${index + 1}</div>
+          <div class="sort-content">
+            <div class="sort-title">${item.name}</div>
+            <div class="sort-desc">
+              <strong>Motivación:</strong> ${item.motivacion}<br>
+              <strong>Métodos:</strong> ${item.metodos}
+            </div>
+          </div>
+          <div class="sort-controls">
+            <button class="sort-btn-arrow" onclick="moveAttacker(${index}, -1)" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+            <button class="sort-btn-arrow" onclick="moveAttacker(${index}, 1)" ${index === currentOrderState.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    window.moveAttacker = function(index, direction) {
+      SoundEngine.tap();
+      const newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= currentOrderState.length) return;
+      const temp = currentOrderState[index];
+      currentOrderState[index] = currentOrderState[newIndex];
+      currentOrderState[newIndex] = temp;
+      renderSortList();
+    };
+
+    document.getElementById("btn-check-order").addEventListener("click", () => {
+      const feedback = document.getElementById("order-feedback");
+      let allCorrect = true;
+      let correctCount = 0;
+
+      for (let i = 0; i < currentOrderState.length; i++) {
+        if (currentOrderState[i].rank === i + 1) {
+          correctCount++;
+        } else {
+          allCorrect = false;
+        }
+      }
+
+      if (allCorrect) {
+        SoundEngine.correct();
+        feedback.className = "feedback-box correct show";
+        feedback.innerHTML = `
+          <strong>🎉 ¡Orden Perfecto! (5/5 Correctos)</strong><br>
+          Has ordenado de <em>Menor a Mayor Sofisticación</em> exactamente como indica el temario:<br>
+          1. Oportunistas ➔ 2. Hacktivistas ➔ 3. Criminales organizados ➔ 4. APT ➔ 5. Estados-nación.<br><br>
+          <strong>Diferencia clave en Defensa:</strong> En los niveles 1, 2 y 3 el enfoque es <em>Prevenir, detectar y reaccionar</em>. En niveles 4 y 5 (APT y Estados), los esfuerzos se concentran prioritariamente en <em>Detectar y reaccionar con rapidez</em>.
+        `;
+      } else {
+        SoundEngine.wrong();
+        feedback.className = "feedback-box wrong show";
+        feedback.innerHTML = `
+          <strong>Aún no está en orden (${correctCount}/5 posiciones correctas)</strong><br>
+          Recuerda la escala ascendente de sofisticación técnica y recursos: desde la simple curiosidad del aficionado hasta los recursos ilimitados de un Estado. Utiliza las flechas ▲ y ▼ para corregir las posiciones.
+        `;
+      }
+    });
+
+    // SUBTABS DE JUEGO 2
+    const subtabSort = document.getElementById("subtab-sort");
+    const subtabMatch = document.getElementById("subtab-match");
+    const sortView = document.getElementById("matrix-sort-view");
+    const matchView = document.getElementById("matrix-match-view");
+
+    subtabSort.addEventListener("click", () => {
+      SoundEngine.tap();
+      subtabSort.classList.add("active");
+      subtabMatch.classList.remove("active");
+      sortView.style.display = "block";
+      matchView.style.display = "none";
+    });
+
+    subtabMatch.addEventListener("click", () => {
+      SoundEngine.tap();
+      subtabMatch.classList.add("active");
+      subtabSort.classList.remove("active");
+      sortView.style.display = "none";
+      matchView.style.display = "block";
+      renderMatchChallenge();
+    });
+
+    // RETO DE ENFOQUE DEFENSIVO (JUEGO 2 SUBMODO)
+    let currentMatchProfile = null;
+
+    function renderMatchChallenge() {
+      const container = document.getElementById("matrix-match-container");
+      currentMatchProfile = ATTACKERS_DATA[Math.floor(Math.random() * ATTACKERS_DATA.length)];
+
+      container.innerHTML = `
+        <div class="attacker-badge-row">
+          <span class="badge badge-purple">${currentMatchProfile.levelText}</span>
+          <span class="badge ${currentMatchProfile.isAdvanced ? 'badge-yellow' : 'badge-cyan'}">
+            ${currentMatchProfile.isAdvanced ? 'Amenaza Crítica' : 'Amenaza Común'}
+          </span>
+        </div>
+
+        <div style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 8px;">
+          ${currentMatchProfile.name}
+        </div>
+
+        <div class="matrix-grid-view">
+          <div class="matrix-cell">
+            <div class="matrix-cell-label">Motivación principal</div>
+            <div>${currentMatchProfile.motivacion}</div>
+          </div>
+          <div class="matrix-cell">
+            <div class="matrix-cell-label">Métodos y técnicas</div>
+            <div>${currentMatchProfile.metodos}</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; font-weight: 700; font-size: 0.95rem; color: var(--neon-cyan);">
+          ¿Cuál es el enfoque de defensa empresarial obligatorio ante este perfil?
+        </div>
+
+        <div class="options-grid" style="margin-top: 10px;">
+          <button class="option-btn" onclick="checkMatchDefense('Prevenir, detectar y reaccionar', this)">
+            <div class="option-indicator">1</div>
+            <div><strong>Prevenir, detectar y reaccionar</strong> (Ciclo completo o preventivo estándar)</div>
+          </button>
+          <button class="option-btn" onclick="checkMatchDefense('Detectar y reaccionar', this)">
+            <div class="option-indicator">2</div>
+            <div><strong>Detectar y reaccionar</strong> (Prioridad absoluta en detección temprana y respuesta inmediata)</div>
+          </button>
+        </div>
+
+        <div class="feedback-box" id="match-feedback" style="margin-top: 12px;"></div>
+        <button class="btn-action" id="btn-next-match" onclick="renderMatchChallenge()" style="display: none; margin-top: 12px;">
+          Siguiente Atacante Aleatorio ➔
+        </button>
+      `;
+    }
+
+    window.checkMatchDefense = function(selectedDefense, btn) {
+      const feedback = document.getElementById("match-feedback");
+      const nextBtn = document.getElementById("btn-next-match");
+      const allBtns = document.querySelectorAll("#matrix-match-container .option-btn");
+      allBtns.forEach(b => b.style.pointerEvents = "none");
+
+      if (selectedDefense === currentMatchProfile.defensa) {
+        SoundEngine.correct();
+        btn.classList.add("correct");
+        feedback.className = "feedback-box correct show";
+        feedback.innerHTML = `
+          <strong>¡Correcto! Enfoque acertado</strong><br>
+          ${currentMatchProfile.defensaDetalle}
+        `;
+      } else {
+        SoundEngine.wrong();
+        btn.classList.add("wrong");
+        allBtns.forEach(b => {
+          if (b.textContent.includes(currentMatchProfile.defensa)) b.classList.add("correct");
+        });
+        feedback.className = "feedback-box wrong show";
+        feedback.innerHTML = `
+          <strong>Respuesta Incorrecta para este nivel de amenaza</strong><br>
+          Para <em>${currentMatchProfile.name}</em> el temario prescribe: <strong>${currentMatchProfile.defensa}</strong>.<br>
+          <em>${currentMatchProfile.defensaDetalle}</em>
+        `;
+      }
+      nextBtn.style.display = "flex";
+    };
+
+    /* ==========================================================================
+       7. SECCIÓN 3: DICCIONARIO DE ESTUDIO COMPLETO
+       ========================================================================== */
+    const DICTIONARY_DATA = [
+      {
+        term: "Activo",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "Cualquier recurso de la organización imprescindible para llevar a cabo su actividad. Su deterioro o no disponibilidad implica un agravio o un coste económico. Comprende bienes, derechos y recursos controlados por la empresa para generar rendimientos futuros.",
+        examTip: "Flujo fundamental: Es el elemento afectado tras la explotación de la vulnerabilidad."
+      },
+      {
+        term: "Amenaza (o Ataque)",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "Cualquier circunstancia desfavorable que pueda ocurrir y derive en consecuencias negativas para los activos. Puede provenir de ataques externos deliberados, errores humanos involuntarios o desastres naturales.",
+        examTip: "La amenaza EXPLOTA una vulnerabilidad existente."
+      },
+      {
+        term: "Vulnerabilidad",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "Fallo de diseño, programación o configuración que permite a un atacante alterar el funcionamiento normal de un programa o sistema y ejecutar acciones maliciosas (modificar datos sensibles, interrumpir servicios o tomar control).",
+        examTip: "3 Orígenes: Fallos de implementación (bugs), Fallos de diseño y Fallos de configuración."
+      },
+      {
+        term: "Bugs (Fallos de implementación)",
+        category: "amenazas",
+        catName: "Vulnerabilidades",
+        def: "Debilidades técnicas derivadas de la programación práctica del software (ej. inyección SQL, desbordamientos de búfer, cross-site scripting).",
+        examTip: "Regla de examen: No todos los bugs son vulnerabilidades; solo aquellos explotables maliciosamente son relevantes en ciberseguridad."
+      },
+      {
+        term: "Fallos de Configuración",
+        category: "amenazas",
+        catName: "Vulnerabilidades",
+        def: "Debilidades derivadas habitualmente de instalaciones por defecto que mantienen activados puertos, cuentas o servicios innecesarios no utilizados.",
+        examTip: "Causa número uno de exposición no intencionada en despliegues rápidos."
+      },
+      {
+        term: "Impacto (o Consecuencia)",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "Efectos adversos producidos cuando una amenaza se materializa aprovechando una vulnerabilidad sobre un activo. Afecta severamente a la operatividad, las finanzas o la reputación corporativa.",
+        examTip: "Cálculo del riesgo = Probabilidad × Impacto."
+      },
+      {
+        term: "Probabilidad",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "La posibilidad cuantitativa o cualitativa de que una amenaza se materialice. Se evalúa teniendo en cuenta la frecuencia histórica de ocurrencia y la existencia efectiva de vulnerabilidades explotables.",
+        examTip: "Frecuencia histórica + vulnerabilidad real existente."
+      },
+      {
+        term: "Riesgo Inherente vs. Residual",
+        category: "riesgo",
+        catName: "Gestión de Riesgos",
+        def: "El Riesgo Inherente es el nivel de exposición previo a cualquier medida de seguridad. El Riesgo Residual es el nivel de riesgo que permanece tras aplicar las contramedidas y controles adecuados (norma ISO 17799).",
+        examTip: "El riesgo residual final la organización solo puede: asumirlo/aceptarlo o externalizarlo (seguros)."
+      },
+      {
+        term: "Tríada CID",
+        category: "riesgo",
+        catName: "Seguridad de la Información",
+        def: "Los tres pilares esenciales que la gestión de seguridad debe garantizar sobre los recursos de información: Confidencialidad, Integridad y Disponibilidad.",
+        examTip: "Afectados por diversas amenazas (ej. DoS atenta contra la Disponibilidad)."
+      },
+      {
+        term: "Marco Normativo Interno (4 Niveles)",
+        category: "riesgo",
+        catName: "Gobernanza",
+        def: "Estructura de 4 niveles: 1. Política (directrices generales del marco) ➔ 2. Estándar (requisitos obligatorios específicos) ➔ 3. Línea Base (mínimos exigibles de protección) ➔ 4. Procedimiento (paso a paso operativo).",
+        examTip: "Debe complementarse indispensablemente con programas de concienciación a empleados."
+      },
+      {
+        term: "Ransomware",
+        category: "amenazas",
+        catName: "Tipos de Amenazas (ETL)",
+        def: "Malware sumamente lesivo que cifra la información crítica de una organización exigiendo un rescate económico a cambio de la clave de descifrado.",
+        examTip: "Dato ETL: Se estima que hasta el 60 % de las víctimas han llegado a pagar el rescate."
+      },
+      {
+        term: "Ataque de Abrevadero (Watering Hole)",
+        category: "amenazas",
+        catName: "Ataques Web",
+        def: "Ataque web dirigido que consiste en infectar sitios web legítimos frecuentados habitualmente por el colectivo o sector que se desea vulnerar.",
+        examTip: "Infecta el sitio donde la víctima acude a 'beber' información."
+      },
+      {
+        term: "Formjacking & Drive-by",
+        category: "amenazas",
+        catName: "Ataques Web",
+        def: "Formjacking: Secuestro malicioso de formularios web (ej. robo de tarjetas de crédito al tramitar compras). Drive-by: Descargas involuntarias de malware al navegar por sitios infectados sin interacción explícita.",
+        examTip: "Ambos forman parte de los Web-based attacks del informe ENISA ETL."
+      },
+      {
+        term: "Zero Trust (Confianza Cero)",
+        category: "amenazas",
+        catName: "Arquitectura Defensiva",
+        def: "Filosofía y arquitectura de ciberseguridad avanzada que elimina la confianza implícita dentro de la red corporativa, exigiendo autenticación y autorización continua en cada acceso.",
+        examTip: "Junto a la IA, constituye la medida recomendada ante ataques sofisticados."
+      },
+      {
+        term: "Atacantes Oportunistas / por Hobby",
+        category: "atacantes",
+        catName: "Perfiles de Atacantes",
+        def: "Nivel 1 de sofisticación. Motivación: curiosidad o malicia simple. Métodos: hacking ocasional y defacement (alteración visual de páginas web). Defensa: ciclo completo (prevenir, detectar y reaccionar).",
+        examTip: "Nivel más bajo de sofisticación técnica y recursos."
+      },
+      {
+        term: "Hacktivistas (ej. Anonymous)",
+        category: "atacantes",
+        catName: "Perfiles de Atacantes",
+        def: "Nivel 2 de sofisticación. Motivación: disrupción de servicios, humillación o reivindicación política/social. Métodos: denegaciones de servicio (DoS) y brechas de seguridad. Defensa: enfoque preventivo y reactivo estándar.",
+        examTip: "Buscan notoriedad pública y reivindicación, no beneficio económico directo."
+      },
+      {
+        term: "Criminales Organizados",
+        category: "atacantes",
+        catName: "Perfiles de Atacantes",
+        def: "Nivel 3 de sofisticación. Motivación: beneficio económico directo mediante fraude, estafa y extorsión. Métodos: troyanos bancarios, malware genérico y ransomware masivo. Defensa: prevenir, detectar y reaccionar.",
+        examTip: "Eje central: lucro económico y monetización rápida."
+      },
+      {
+        term: "Amenazas Persistentes Avanzadas (APT)",
+        category: "atacantes",
+        catName: "Perfiles de Atacantes",
+        def: "Nivel 4 de sofisticación. Motivación: robo de propiedad intelectual y espionaje corporativo continuo a largo plazo. Métodos: malware altamente dirigido, movimiento lateral y técnicas avanzadas.",
+        examTip: "Defensa empresarial: Detectar y reaccionar (prioridad en detección temprana y respuesta rápida)."
+      },
+      {
+        term: "Ataques Patrocinados por Gobiernos (Estados-nación)",
+        category: "atacantes",
+        catName: "Perfiles de Atacantes",
+        def: "Nivel 5 (Mayor sofisticación y recursos ilimitados). Motivación: disrupción de infraestructuras críticas, cibersabotaje internacional y espionaje diplomático militar.",
+        examTip: "Defensa empresarial: Detectar y reaccionar de forma inmediata ante incursiones."
+      },
+      {
+        term: "Cyber Threat Intelligence (CTI)",
+        category: "cti",
+        catName: "Inteligencia de Amenazas",
+        def: "Información sobre ciberamenazas recopilada, evaluada según la fiabilidad de su fuente y analizada metódicamente para reducir la incertidumbre en la toma de decisiones.",
+        examTip: "Debe cumplir 4 atributos: Oportuna, Precisa, Procesable y Relevante."
+      },
+      {
+        term: "Tríada del Análisis CTI",
+        category: "cti",
+        catName: "Inteligencia de Amenazas",
+        def: "Marco analítico compuesto por: 1. Actores (quién está detrás), 2. Intención y Capacidad (qué buscan y qué recursos tienen), y 3. TTPs y Motivaciones (métodos y tácticas utilizadas).",
+        examTip: "Va más allá de datos aislados: correlaciona al actor con sus métodos."
+      },
+      {
+        term: "Inteligencia Estratégica vs. Táctica vs. Operativa",
+        category: "cti",
+        catName: "Niveles de Inteligencia",
+        def: "Estratégica: dirigida a directivos/toma de decisiones corporativas a largo plazo. Operativa/Técnica: enfocada a equipos de respuesta a incidentes y análisis forense de campañas/malware. Táctica: orientada a la operativa en tiempo real mediante IoCs (hashes, IPs, firmas).",
+        examTip: "Estratégica = Directores; Operativa = Forenses/SOC; Táctica = Filtros/IoC en tiempo real."
+      },
+      {
+        term: "Ciclo de Inteligencia",
+        category: "cti",
+        catName: "Proceso CTI",
+        def: "Proceso continuo, iterativo y formalmente circular mediante el cual los datos en bruto se transforman en conocimiento procesable para proteger los activos.",
+        examTip: "Es circular y continuo, nunca lineal ni finito."
+      },
+      {
+        term: "Flujo de Procesamiento Manual (5 Etapas)",
+        category: "intercambio",
+        catName: "Intercambio de Información",
+        def: "1. Agregación (múltiples fuentes: honeynets, CERTs, feeds) ➔ 2. Enriquecimiento (contextualización) ➔ 3. Filtrado (limpieza de ruido y duplicados) ➔ 4. Categorización (clasificación por severidad) ➔ 5. Entrega (difusión a analistas/herramientas).",
+        examTip: "Orden de examen estricto: Agregación ➔ Enriquecimiento ➔ Filtrado ➔ Categorización ➔ Entrega."
+      },
+      {
+        term: "STIX / TAXII",
+        category: "intercambio",
+        catName: "Estándares de Intercambio",
+        def: "STIX (Structured Threat Information Expression) es el lenguaje estructurado en JSON/XML para representar información de ciberamenazas. TAXII (Trusted Automated Exchange of Intelligence Information) es el protocolo de transporte automatizado para intercambiar STIX.",
+        examTip: "Permite el lenguaje común procesable por máquinas entre distintas entidades."
+      },
+      {
+        term: "CCN-LUCIA",
+        category: "intercambio",
+        catName: "Plataformas Nacionales",
+        def: "Plataforma de intercambio y gestión de ciberincidentes desarrollada por el Centro Criptológico Nacional (CCN-CERT) en España para administraciones y entidades bajo el ENS.",
+        examTip: "Solución de referencia española para coordinación e intercambio colaborativo."
+      },
+      {
+        term: "Esquema Nacional de Seguridad (ENS)",
+        category: "riesgo",
+        catName: "Marco Legal Español",
+        def: "Regulación nacional en España establecida para garantizar la seguridad de los sistemas, datos, comunicaciones y servicios electrónicos del sector público y sus proveedores tecnológicos.",
+        examTip: "Establece la taxonomía y criterios de notificación obligatoria de incidentes."
+      }
+    ];
+
+    function renderDictionary(filter = "all", query = "") {
+      const listEl = document.getElementById("dict-list");
+      listEl.innerHTML = "";
+
+      const normalizedQuery = query.toLowerCase().trim();
+
+      const filtered = DICTIONARY_DATA.filter(item => {
+        const matchesCategory = (filter === "all" || item.category === filter);
+        const matchesQuery = !query || 
+          item.term.toLowerCase().includes(normalizedQuery) ||
+          item.def.toLowerCase().includes(normalizedQuery) ||
+          item.examTip.toLowerCase().includes(normalizedQuery) ||
+          item.catName.toLowerCase().includes(normalizedQuery);
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="card" style="text-align: center; color: var(--text-muted); padding: 30px 10px;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">🔍</div>
+            No se encontraron conceptos que coincidan con la búsqueda.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "dict-card";
+        card.innerHTML = `
+          <div class="dict-term">
+            <span>${item.term}</span>
+            <span class="dict-category">${item.catName}</span>
+          </div>
+          <div class="dict-def">${item.def}</div>
+          <div class="dict-exam-tip">
+            <strong>💡 Clave Examen:</strong> ${item.examTip}
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // Filtros de categoría del diccionario
+    const filterPills = document.querySelectorAll(".filter-pill");
+    let activeFilter = "all";
+
+    filterPills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        SoundEngine.tap();
+        filterPills.forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        activeFilter = pill.getAttribute("data-cat");
+        renderDictionary(activeFilter, document.getElementById("dict-search").value);
+      });
+    });
+
+    // Buscador interactivo
+    const searchInput = document.getElementById("dict-search");
+    const clearBtn = document.getElementById("dict-search-clear");
+
+    searchInput.addEventListener("input", (e) => {
+      const val = e.target.value;
+      clearBtn.style.display = val.length > 0 ? "block" : "none";
+      renderDictionary(activeFilter, val);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      SoundEngine.tap();
+      searchInput.value = "";
+      clearBtn.style.display = "none";
+      renderDictionary(activeFilter, "");
+      searchInput.focus();
+    });
+
+    /* ==========================================================================
+       8. INICIALIZACIÓN GLOBAL DE LA APLICACIÓN
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      initGame1();
+      initAttackerSortGame();
+      renderDictionary();
+    });
+  </script>
+</body>
+</html>
